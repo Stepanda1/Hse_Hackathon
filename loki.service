@@ -1,0 +1,15 @@
+[Unit]
+Description=Grafana Loki Service
+After=network.target
+
+[Service]
+User=loki
+Group=loki
+Type=simple
+ExecStart=/home/user/loki/loki-linux-amd64 -config.file=/home/user/loki/loki-config.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

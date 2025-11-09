@@ -1,0 +1,35 @@
+services:
+        cadvisor:
+                image: gcr.io/cadvisor/cadvisor:latest
+                container_name: cadvisor
+                volumes:
+                - /:/rootfs:ro
+                - /var/run:/var/run:ro
+                - /sys:/sys:ro
+                - /var/lib/docker/:/var/lib/docker:ro
+                - /dev/disk/:/dev/disk:ro
+                ports:
+                        - "8080:8080"
+                        privileged: true
+                devices:
+                        - /dev/kmsg
+                restart: unless-stopped
+        postgres-exporter:
+                image: quay.io/prometheuscommunity/postgres-exporter:latest
+                container_name: postgres-exporter
+                network_mode: host
+                environment:
+                DATA_SOURCE_URI: "localhost:5432/postgres?sslmode=disable"
+                DATA_SOURCE_USER: "appuser"
+                DATA_SOURCE_PASS: "apppass"
+                restart: unless-stopped
+        rabbitmq-exporter:
+                image: kbudde/rabbitmq-exporter:latest
+                container_name: rabbitmq-exporter
+                network_mode: host
+                environment:
+                        RABBIT_URL: "http://localhost:15672"
+                        RABBIT_USER: "guest"
+                        RABBIT_PASSWORD: "guest"
+                restart: unless-stopped
+

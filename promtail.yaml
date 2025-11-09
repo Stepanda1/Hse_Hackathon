@@ -1,0 +1,35 @@
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /home/user/promtail/positions.yaml
+
+clients:
+  - url: http://192.168.0.106:3100/loki/api/v1/push
+
+
+scrape_configs:
+- job_name: ForMonitoring_logs
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: ForMonitoring_logs
+      __path__: /home/user/ForMonitoring/logs/*.json
+
+  pipeline_stages:
+    - match:
+        selector: '{job="ForMonitoring_logs"}'
+        stages:
+        - regex:
+            expression:
+                (?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+(?P<timezone>[\+\-]\d{2}:\d{2})\s+\[(?P<level>\w+)\]\s+(?P<log_type>Ошибка|Информация|Предупреждение)\s+(?P<error_code>\d+)
+        - labels:
+            timestamp:
+            timezone:
+            level:
+            log_type:
+            error_code:
+
